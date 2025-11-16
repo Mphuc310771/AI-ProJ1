@@ -10,7 +10,6 @@ from aco import ACO
 
 distance_file = r"dantzig42_d.txt"
 
-# File chứa ma trận khoảng cách dạng từng dòng cách nhau khoảng trắng
 distance_matrix = np.loadtxt(distance_file)
 
 num_cities = distance_matrix.shape[0]
