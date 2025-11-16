@@ -26,7 +26,7 @@ def safe_filename(name: str) -> str:
 # 1. Convergence Plot
 # ======================================================
 def plot_convergence(histories, title, xlabel='Evaluations', ylabel='Best objective',
-                     savepath: str | None = None, savedir: str = "results_rastrigin"):
+                     savepath: str | None = None, savedir: str | None=None):
 
     ensure_dir(savedir)
 
@@ -65,7 +65,7 @@ def plot_convergence(histories, title, xlabel='Evaluations', ylabel='Best object
 # 2. Final fitness boxplot
 # ======================================================
 def boxplot_finals(finals_dict, title='Final Fitness (per algorithm)',
-                   savepath: str | None = None, savedir: str = "results_rastrigin"):
+                   savepath: str | None = None, savedir: str | None=None):
 
     ensure_dir(savedir)
 
@@ -90,7 +90,7 @@ def boxplot_finals(finals_dict, title='Final Fitness (per algorithm)',
 # 3. Success rate plot
 # ======================================================
 def plot_success_rate(histories_dict, thresholds=(1e-3,),
-                      title='Success rate vs evals', save_dir: str = "results_rastrigin"):
+                      title='Success rate vs evals', save_dir: str | None=None):
 
     ensure_dir(save_dir)
  
@@ -129,7 +129,7 @@ def plot_success_rate(histories_dict, thresholds=(1e-3,),
 # 4. Memory boxplot
 # ======================================================
 def boxplot_memory(mem_dict: dict, title='Peak memory usage (bytes)',
-                   savepath: str | None = None, savedir: str = "results_rastrigin"):
+                   savepath: str | None = None, savedir: str | None=None):
 
     ensure_dir(savedir)
 
