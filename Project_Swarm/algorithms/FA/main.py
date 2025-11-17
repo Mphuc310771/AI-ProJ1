@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+
 # ================================================================
 #  EXAMPLE CODE (Continuous + Discrete)
 # ================================================================
@@ -164,6 +165,130 @@ def sensitivity_analysis():
 
 
 
+# ================================================================
+#  READ DATASET FILE
+# ================================================================
+def load_datasets(filename="datasets.txt"):
+    datasets = []
+    lines = []
+
+    with open(filename, "r") as f:
+        lines = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+
+    i = 0
+    while i < len(lines):
+        parts = lines[i].split()
+
+        # -------- Sphere test case --------
+        if parts[0].upper() == "SPHERE":
+            dim = int(parts[1])
+            datasets.append({"type": "sphere", "dim": dim})
+            i += 1
+
+        # -------- Knapsack test case --------py
+        elif parts[0].upper() == "KNAPSACK":
+            dim = int(parts[1])
+
+            values = list(map(int, lines[i + 1].split()[1:]))
+            weights = list(map(int, lines[i + 2].split()[1:]))
+
+            cap_parts = lines[i + 3].split()
+            capacity = int(cap_parts[1])
+
+            datasets.append({
+                "type": "knapsack",
+                "dim": dim,
+                "values": np.array(values),
+                "weights": np.array(weights),
+                "capacity": capacity
+            })
+
+            i += 4
+
+        else:
+            i += 1
+
+    return datasets
+
+# ================================================================
+#  RUN ALL TEST CASES FROM FILE
+# ================================================================
+def run_test_cases():
+
+    print("\n==============================")
+    print("   RUNNING DATASET EXAMPLES")
+    print("==============================\n")
+
+    datasets = load_datasets("datasets.txt")
+
+    for idx, data in enumerate(datasets, start=1):
+        print(f"\n===== TEST CASE #{idx} =====")
+
+        # ====================================================
+        #  SPHERE TEST CASE
+        # ====================================================
+        if data["type"] == "sphere":
+
+            dim = data["dim"]
+            print(f"→ Sphere function | dim = {dim}")
+
+            def sphere(x):
+                return np.sum(np.square(x))
+
+            fa = FireflyAlgorithm(
+                objective_fn=sphere,
+                dim=dim,
+                n_fireflies=30,
+                max_gen=100,
+                alpha=0.5,
+                beta0=1.0,
+                gamma=0.01,
+                lb=-10,
+                ub=10,
+                problem_type="continuous",
+                seed=42
+            )
+
+            best_pos, best_val, curve = fa.optimize(verbose=True)
+            print("Best fitness:", best_val)
+            print("Best solution:", best_pos[:10])
+
+        # ====================================================
+        #  KNAPSACK TEST CASE
+        # ====================================================
+        elif data["type"] == "knapsack":
+
+            values = data["values"]
+            weights = data["weights"]
+            capacity = data["capacity"]
+            dim = data["dim"]
+
+            print(f"→ Knapsack | dim = {dim}")
+
+            def knapsack_value(sol):
+                sol = np.asarray(sol).astype(int)
+                total_weight = np.sum(sol * weights)
+                return 0 if total_weight > capacity else int(np.sum(sol * values))
+
+            fa = FireflyAlgorithm(
+                objective_fn=knapsack_value,
+                dim=dim,
+                n_fireflies=30,
+                max_gen=100,
+                alpha=0.3,
+                beta0=1.0,
+                gamma=1.0,
+                problem_type="discrete",
+                seed=7
+            )
+
+            best_sol, best_val, curve = fa.optimize(verbose=True)
+            print("Best fitness:", best_val)
+            print("Best solution:", best_sol)
+
+        print("\n----------------------------------------")
+
+
 
 # ================================================================
 #  MAIN MENU
@@ -175,15 +300,19 @@ def main():
     print("==============================")
     print("1. Run original examples (continuous + knapsack)")
     print("2. Run parameter sensitivity analysis")
+    print("3. Run test cases")
     print("==============================")
 
-    choice = input("Choose option (1/2): ").strip()
+    choice = input("Choose option (1/2/3): ").strip()
 
     if choice == "1":
         run_examples()
 
     elif choice == "2":
         sensitivity_analysis()
+
+    elif choice == "3":
+        run_test_cases()
 
     else:
         print("Invalid choice.")
